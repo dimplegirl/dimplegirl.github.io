@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Music Player</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+      integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="music_container">
+        <div class="titles">
+          <h2 id="title">Natarang Ubha</h2>
+          <h3 id="artist">Ajay-Atul</h3>
+        </div>
+
+        <div class="img_container">
+          <img
+            src="images/Natarang.jpg"
+            width="200px"
+            height="200px"
+            class=""
+            alt=""
+          />
+        </div>
+        <audio src="audios/Natarang.mp3"></audio>
+
+        <div class="progressbar_container">
+          <div class="progress_duration_meter">
+            <div id="current_time">00:00</div>
+            <div id="duration">00:00</div>
+          </div>
+          <div class="progress_div" id="progress_div">
+            <div class="progress" id="progress"></div>
+          </div>
+        </div>
+
+        <div class="music_controls">
+          <i class="fas fa-backward" id="prev" title="previous"></i>
+          <i class="fas fa-play main_button" id="play" title="play"></i>
+
+          <i class="fas fa-forward" id="next" title="forward"></i>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const music = document.querySelector("audio");
+      const img = document.querySelector("img");
+      const title = document.getElementById("title");
+      const artist = document.getElementById("artist");
+      const play = document.getElementById("play");
+      const prev = document.getElementById("prev");
+      const next = document.getElementById("next");
+      let current_time = document.getElementById("current_time");
+      let totalDuration = document.getElementById("duration");
+      let progress = document.getElementById("progress");
+      let progress_div = document.getElementById("progress_div");
+      const songs = [
+        {
+          name: "Natarang",
+          title: "Natarang Ubha",
+          artist: "Ajay-Atul",
+        },
+        {
+          name: "Faded",
+          title: "Faded",
+          artist: "Alan Walker",
+        },
+      ];
+
+      let isPlaying = false;
+
+      //   for play function
+      const playMusic = () => {
+        isPlaying = true;
+        music.play();
+        play.classList.replace("fa-play", "fa-pause");
+        img.classList.add("anime");
+      };
+
+      // for pause function
+      const pauseMusic = () => {
+        isPlaying = false;
+        music.pause();
+        play.classList.replace("fa-pause", "fa-play");
+        img.classList.remove("anime");
+      };
+
+      //   play and pause music
+      play.addEventListener("click", () => {
+        //   if(isPlaying){
+        //       pauseMusic()
+        //   }else{
+        //       playMusic()
+        //   }
+        // using ternary operator
+
+        isPlaying ? pauseMusic() : playMusic();
+      });
+
+      const loadSong = (songs) => {
+        title.textContent = songs.title;
+        artist.textContent = songs.artist;
+        img.src = "images/" + songs.name + ".jpg";
+        music.src = "audios/" + songs.name + ".mp3";
+      };
+
+      let songIndex = 0;
+      // previous song
+      const prevSong = () => {
+        songIndex = (songIndex - 1) % songs.length;
+        loadSong(songs[songIndex]);
+        playMusic();
+      };
+
+      // next song
+      const nextSong = () => {
+        songIndex = (songIndex + 1) % songs.length;
+        loadSong(songs[songIndex]);
+        playMusic();
+      };
+
+      music.addEventListener("timeupdate", (event) => {
+        // console.log(event);
+        const { currentTime, duration } = event.srcElement;
+
+        let progress_percent = Math.floor((currentTime / duration) * 100);
+        progress.style.width = `${progress_percent}%`;
+
+        // for current time
+        let minute = Math.floor(currentTime / 60);
+        let second = Math.floor(currentTime % 60);
+        if (second < 10) {
+          second = `0${second}`;
+        }
+        if (minute < 10) {
+          minute = `0${minute}`;
+        }
+        let totalCurrentTime = `${minute}:${second}`;
+        current_time.textContent = `${totalCurrentTime}`;
+
+        // for duration
+        let minutes = Math.floor(duration / 60);
+        let seconds = Math.floor(duration % 60);
+        if (seconds < 10) {
+          seconds = `0${seconds}`;
+        }
+        if (minutes < 10) {
+          minutes = `0${minutes}`;
+        }
+        let total_duration = `${minutes}:${seconds}`;
+        if(duration){
+
+        totalDuration.textContent = `${total_duration}`;
+        }
+      });
+
+      progress_div.addEventListener("click", (event) => {
+        const { duration } = music;
+        let cursor = (event.offsetX / event.srcElement.clientWidth) * duration;
+        music.currentTime = cursor;
+      });
+
+      music.addEventListener("ended", nextSong);
+      prev.addEventListener("click", prevSong);
+      next.addEventListener("click", nextSong);
+    </script>
+  </body>
+</html>
